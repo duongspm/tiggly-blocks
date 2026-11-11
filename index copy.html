@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+
+  <!-- Responsive -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO cơ bản -->
+  <title>Tiggly Blocks – Trò Chơi Học Hình Khối Cho Bé</title>
+
+  <meta name="description"
+    content="Tiggly Blocks là trò chơi giáo dục tương tác dành cho trẻ nhỏ. Bé khám phá hình tròn, hình vuông, tam giác, ghép hình sáng tạo và phát triển tư duy qua những trò chơi thú vị.">
+
+  <meta name="author" content="Duongg">
+
+  <meta name="robots" content="index, follow">
+
+  <meta name="googlebot" content="index, follow">
+
+  <meta name="theme-color" content="#38bdf8">
+
+  <!-- Canonical URL: thay bằng domain chính thức -->
+  <link rel="canonical" href="https://tiggly-blocks.vercel.app/">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.png" sizes="any">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+
+  <!-- Open Graph: Facebook, Messenger, Zalo -->
+  <meta property="og:type" content="website">
+
+  <meta property="og:locale" content="vi_VN">
+
+  <meta property="og:site_name" content="Tiggly Blocks">
+
+  <meta property="og:title" content="Tiggly Blocks – Chơi, Học và Sáng Tạo Cùng Hình Khối">
+
+  <meta property="og:description"
+    content="Cùng bé khám phá thế giới hình khối, ghép hình sáng tạo và học hỏi qua những trò chơi giáo dục tương tác vui nhộn.">
+
+  <meta property="og:url" content="https://tiggly-blocks.vercel.app/">
+
+  <meta property="og:image" content="https://tiggly-blocks.vercel.app/ogp.jpg">
+
+  <meta property="og:image:width" content="1200">
+
+  <meta property="og:image:height" content="630">
+
+  <meta property="og:image:alt" content="Tiggly Blocks – Trò chơi giáo dục hình khối cho bé">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+
+  <meta name="twitter:title" content="Tiggly Blocks – Chơi, Học và Sáng Tạo">
+
+  <meta name="twitter:description" content="Khám phá hình khối, ghép hình và sáng tạo cùng Tiggly Blocks.">
+
+  <meta name="twitter:image" content="https://YOUR-DOMAIN.com/assets/ogp-tiggly-blocks.jpg">
+
+  <!-- Structured Data: Google -->
+  <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Tiggly Blocks",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "vi",
+        "author": {
+            "@type": "Person",
+            "name": "Duongg"
+        },
+        "description": "Trò chơi giáo dục tương tác giúp trẻ khám phá hình khối, ghép hình và phát triển tư duy sáng tạo."
+    }
+    </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap">
+  <style>
+    :root {
+      --bg: #fff7e8;
+      --panel: #fff;
+      --text: #3b2f2f;
+      --line: #f0d9b5;
+      --accent: #3fa7e0;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #1f1a17;
+        --panel: #2b2420;
+        --text: #f3e8dc;
+        --line: #4a3d34
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #1f1a17;
+      --panel: #2b2420;
+      --text: #f3e8dc;
+      --line: #4a3d34
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Baloo 2", "Segoe UI", system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      overscroll-behavior: none;
+      user-select: none;
+      -webkit-user-select: none
+    }
+
+    #bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      font-size: .85rem
+    }
+
+    button {
+      font: inherit;
+      border: 2px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 4px 12px;
+      cursor: pointer
+    }
+
+    button.on {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff
+    }
+
+    label {
+      display: flex;
+      gap: 6px;
+      align-items: center
+    }
+
+    #status {
+      padding: 0 12px 6px;
+      font-size: .85rem;
+      min-height: 1.4em
+    }
+
+    #board {
+      flex: 1;
+      position: relative;
+      margin: 0 12px 12px;
+      border: 3px dashed var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      touch-action: none
+    }
+
+    #hint {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      opacity: .45;
+      padding: 16px;
+      pointer-events: none
+    }
+
+    .s {
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: pop .3s cubic-bezier(.3, 1.8, .5, 1)
+    }
+
+    .s.old {
+      opacity: .8;
+      animation: none
+    }
+
+    .s svg {
+      width: 100%;
+      height: 100%
+    }
+
+    .dot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text);
+      opacity: .35;
+      transform: translate(-50%, -50%);
+      pointer-events: none
+    }
+
+    @keyframes pop {
+      from {
+        transform: translate(-50%, -50%) scale(0)
+      }
+
+      to {
+        transform: translate(-50%, -50%) scale(1)
+      }
+    }
+
+    #games {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 0 12px 6px
+    }
+
+    #hud {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      z-index: 2;
+      pointer-events: none
+    }
+
+    #hud button {
+      pointer-events: auto
+    }
+
+    .big {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 4px
+    }
+
+    .big svg,
+    .tg svg {
+      width: 100%;
+      height: 100%
+    }
+
+    .tg {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      opacity: .55;
+      color: var(--text)
+    }
+
+    .tg.done {
+      opacity: 1;
+      animation: pop .35s cubic-bezier(.3, 1.8, .5, 1)
+    }
+
+    :root {
+      --sky1: #bfe9ff;
+      --sky2: #fff6d6;
+      --ink: #2b3a55
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --sky1: #1b2a49;
+        --sky2: #34507f;
+        --ink: #fff
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --sky1: #1b2a49;
+      --sky2: #34507f;
+      --ink: #fff
+    }
+
+    body {
+      font-family: "Fredoka", "Baloo 2", "Segoe UI", system-ui, sans-serif;
+      background: linear-gradient(var(--sky1), var(--sky2)) fixed;
+      color: var(--ink)
+    }
+
+    button {
+      font-family: inherit;
+      font-weight: 600;
+      touch-action: manipulation
+    }
+
+    #top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px 4px;
+      position: relative;
+      z-index: 30
+    }
+
+    #top button {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 0;
+      padding: 0;
+      font-size: 1.6rem;
+      background: #fff;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, .15)
+    }
+
+    #top button:active,
+    .tile:active {
+      transform: translateY(5px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, .15)
+    }
+
+    #title {
+      flex: 1;
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 700
+    }
+
+    body.home #title,
+    body.home #homeBtn {
+      visibility: hidden
+    }
+
+    #board {
+      margin: 4px 14px 18px;
+      border: 6px solid #ffd43b;
+      border-radius: 32px;
+      background: radial-gradient(circle, #e3eef9 2px, transparent 2.5px) 0 0/28px 28px, #fff;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, .12)
+    }
+
+    #board.shake {
+      animation: shake .3s
+    }
+
+    #hint {
+      color: #6b7c93;
+      opacity: .7;
+      font-size: 1.8rem;
+      font-weight: 600
+    }
+
+    #hud {
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      top: 12px;
+      background: #fff;
+      color: #3b2f2f;
+      border-radius: 26px;
+      padding: 8px 22px;
+      box-shadow: 0 5px 0 rgba(0, 0, 0, .12), 0 0 0 3px #ffd43b;
+      font-size: 1.35rem;
+      max-width: 90%
+    }
+
+    #hud:empty {
+      display: none
+    }
+
+    #hud button {
+      margin-top: 6px;
+      border: 0;
+      background: #40c057;
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 22px;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 0 #2f9e44
+    }
+
+    .s {
+      filter: drop-shadow(0 8px 6px rgba(0, 0, 0, .25))
+    }
+
+    .s svg * {
+      stroke: #fff;
+      stroke-width: 5;
+      paint-order: stroke
+    }
+
+    .s::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='38' cy='46' r='5' fill='%23333'/%3E%3Ccircle cx='62' cy='46' r='5' fill='%23333'/%3E%3Cpath d='M36 60q14 14 28 0' stroke='%23333' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") 50% 55%/50% no-repeat
+    }
+
+    .tg {
+      color: #8aa0b8;
+      opacity: .95
+    }
+
+    .tg svg {
+      stroke-width: 4
+    }
+
+    .tg:not(.done) svg {
+      fill: #eef4fb
+    }
+
+    #games {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-content: center;
+      padding: 84px max(16px, calc(50% - 340px)) 24px;
+      background: linear-gradient(var(--sky1), var(--sky2));
+      overflow: auto
+    }
+
+    body.home #games {
+      display: grid
+    }
+
+    .logo {
+      grid-column: 1/-1;
+      text-align: center;
+      font-size: clamp(3rem, 12vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 0 5px 0 rgba(0, 0, 0, .12);
+      margin-bottom: 8px
+    }
+
+    .logo span {
+      display: inline-block;
+      animation: bob 2s ease-in-out infinite
+    }
+
+    .logo span:nth-child(2n) {
+      animation-delay: .3s
+    }
+
+    .logo span:nth-child(3n) {
+      animation-delay: .6s
+    }
+
+    .logo small {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-top: 8px;
+      color: var(--ink);
+      text-shadow: none
+    }
+
+    .tile {
+      border: 0;
+      border-radius: 28px;
+      padding: 16px 8px;
+      color: #fff;
+      font-size: 1.3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 150px;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, .18)
+    }
+
+    .tile small {
+      font-weight: 400;
+      font-size: .85rem;
+      opacity: .95
+    }
+
+    .tile .ic {
+      font-size: 2.8rem;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .3);
+      display: grid;
+      place-items: center;
+      animation: bob 2.4s ease-in-out infinite
+    }
+
+    .deco {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      opacity: .5;
+      animation: float 6s ease-in-out infinite;
+      pointer-events: none
+    }
+
+    .deco svg {
+      width: 100%;
+      height: 100%
+    }
+
+    .d0 {
+      left: 6%;
+      top: 14%
+    }
+
+    .d1 {
+      right: 8%;
+      top: 22%;
+      animation-delay: 1s
+    }
+
+    .d2 {
+      left: 12%;
+      bottom: 8%;
+      animation-delay: 2s
+    }
+
+    #bar {
+      position: fixed;
+      z-index: 50;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(92vw, 440px);
+      max-height: 90vh;
+      overflow: auto;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      padding: 20px;
+      border-radius: 24px;
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .4)
+    }
+
+    #bar[hidden],
+    #scrim[hidden] {
+      display: none
+    }
+
+    #bar h2 {
+      margin: 0;
+      font-size: 1.3rem
+    }
+
+    #bar p {
+      margin: 0;
+      font-size: .9rem;
+      opacity: .8
+    }
+
+    #bar .done {
+      background: #40c057;
+      border-color: #40c057;
+      color: #fff
+    }
+
+    #cals {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    #status {
+      padding: 0
+    }
+
+    #scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      z-index: 40
+    }
+
+    body.cal #bar {
+      top: auto;
+      bottom: 10px;
+      transform: translateX(-50%);
+      padding: 12px
+    }
+
+    body.cal #bar>h2,
+    body.cal #bar>p,
+    body.cal #bar>label,
+    body.cal #reset {
+      display: none
+    }
+
+    .cf {
+      position: fixed;
+      top: -20px;
+      width: 12px;
+      height: 16px;
+      z-index: 60;
+      pointer-events: none;
+      animation: fall 1.6s ease-in forwards
+    }
+
+    @keyframes bob {
+      50% {
+        transform: translateY(-8px)
+      }
+    }
+
+    @keyframes float {
+      50% {
+        transform: translateY(-18px) rotate(12deg)
+      }
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(105vh) rotate(720deg)
+      }
+    }
+
+    @keyframes shake {
+      25% {
+        transform: translateX(-10px)
+      }
+
+      75% {
+        transform: translateX(10px)
+      }
+    }
+
+    .tile[data-m="saf"] {
+      grid-column: 1/-1;
+      min-height: 120px
+    }
+
+    .animal {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: pop .45s cubic-bezier(.3, 1.8, .5, 1);
+      filter: drop-shadow(0 8px 6px rgba(0, 0, 0, .2))
+    }
+
+    .animal svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible
+    }
+
+    .album {
+      margin-top: 2px
+    }
+
+    .album span {
+      font-size: 1.9rem;
+      margin: 0 4px
+    }
+
+    .album .lock {
+      filter: grayscale(1) brightness(1.2);
+      opacity: .35
+    }
+
+    .an-fish {
+      animation: swim 3s ease-in-out infinite
+    }
+
+    .an-fish .tail {
+      transform-box: fill-box;
+      transform-origin: 0 50%;
+      animation: wag .5s ease-in-out infinite alternate
+    }
+
+    .bub {
+      transform-box: fill-box;
+      animation: rise 2s ease-out infinite
+    }
+
+    .an-cat {
+      transform-origin: 50% 100%;
+      animation: tilt 1.6s ease-in-out infinite alternate
+    }
+
+    .an-turtle {
+      animation: crawl 4s ease-in-out infinite alternate
+    }
+
+    .an-turtle .head {
+      transform-box: fill-box;
+      transform-origin: 0 50%;
+      animation: nod 1.2s ease-in-out infinite alternate
+    }
+
+    .an-chick {
+      animation: hop .8s ease-in-out infinite
+    }
+
+    .blink {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+      animation: blink 3s infinite
+    }
+
+    @keyframes swim {
+      50% {
+        transform: translateX(18px) rotate(4deg)
+      }
+    }
+
+    @keyframes wag {
+      from {
+        transform: rotate(-14deg)
+      }
+
+      to {
+        transform: rotate(14deg)
+      }
+    }
+
+    @keyframes rise {
+      from {
+        transform: translateY(0);
+        opacity: 1
+      }
+
+      to {
+        transform: translateY(-40px);
+        opacity: 0
+      }
+    }
+
+    @keyframes tilt {
+      from {
+        transform: rotate(-5deg)
+      }
+
+      to {
+        transform: rotate(5deg)
+      }
+    }
+
+    @keyframes crawl {
+      from {
+        transform: translateX(-14px)
+      }
+
+      to {
+        transform: translateX(14px)
+      }
+    }
+
+    @keyframes nod {
+      from {
+        transform: rotate(-6deg)
+      }
+
+      to {
+        transform: rotate(8deg)
+      }
+    }
+
+    @keyframes hop {
+      50% {
+        transform: translateY(-16px)
+      }
+    }
+
+    @keyframes blink {
+
+      0%,
+      92%,
+      100% {
+        transform: scaleY(1)
+      }
+
+      96% {
+        transform: scaleY(.1)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="bar" hidden>
+    <span>Học khối:</span>
+    <span id="cals"></span>
+    <button id="reset">Xóa dữ liệu học</button>
+    <label><input type="checkbox" id="keep" checked> Giữ hình khi nhấc khối</label>
+    <label>Khoảng gom điểm <input type="range" id="rad" min="60" max="300" value="140"><span
+        id="radv">140</span></label>
+  </div>
+  <div id="status"></div>
+  <div id="games"></div>
+  <div id="top"><button id="homeBtn" aria-label="Màn hình chính">🏠</button>
+    <div id="title"></div><button id="gear" aria-label="Dành cho phụ huynh (giữ 1 giây)">⚙️</button>
+  </div>
+  <div id="board">
+    <div id="hud"></div>
+    <div id="hint">Đặt khối lên màn hình.<br>Lần đầu: bấm “Học khối”, chọn hình rồi đặt đúng khối đó lên.</div>
+  </div>
+  <script>
+    const SHAPES = {
+      circle: { name: "hình tròn", color: "#ef5b5b", freq: 392, svg: '<circle cx="50" cy="50" r="46"/>' },
+      square: { name: "hình vuông", color: "#3fa7e0", freq: 440, svg: '<rect x="6" y="6" width="88" height="88" rx="10"/>' },
+      triangle: { name: "hình tam giác", color: "#f2b705", freq: 523, svg: '<polygon points="50,6 94,92 6,92" stroke-linejoin="round" stroke="#f2b705" stroke-width="6"/>' }
+    };
+    const TOL = 0.18, SETTLE = 60;
+    const board = document.getElementById("board"), hint = document.getElementById("hint"), statusEl = document.getElementById("status");
+    const radEl = document.getElementById("rad"), keepEl = document.getElementById("keep");
+    let samples = { circle: [], square: [], triangle: [] }, calib = null, calibKey = "", calibT = null, timer = null;
+    const pts = new Map(), announced = new Map();
+
+    /* ---------- lưu dữ liệu học ---------- */
+    try { const s = JSON.parse(localStorage.getItem("tiggly-samples") || "null"); if (s) samples = Object.assign(samples, s) } catch (e) { }
+    function save() { try { localStorage.setItem("tiggly-samples", JSON.stringify(samples)) } catch (e) { } }
+
+    /* ---------- âm thanh / giọng nói ---------- */
+    let ac;
+    function beep(f) { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = f; g.gain.setValueAtTime(.25, ac.currentTime); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .4); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + .4) } catch (e) { } }
+    function say(t) { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = "vi-VN"; speechSynthesis.speak(u) } catch (e) { } }
+    const svg = t => `<svg viewBox="0 0 100 100" fill="${SHAPES[t].color}">${SHAPES[t].svg}</svg>`;
+
+    /* ---------- theo dõi điểm chạm ---------- */
+    board.addEventListener("pointerdown", e => { pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); sched() });
+    board.addEventListener("pointermove", e => { if (pts.has(e.pointerId)) { pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); sched() } });
+    ["pointerup", "pointercancel"].forEach(n => window.addEventListener(n, e => { if (pts.delete(e.pointerId)) sched() }));
+    board.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
+    board.addEventListener("contextmenu", e => e.preventDefault());
+    function sched() { clearTimeout(timer); timer = setTimeout(render, SETTLE) }
+
+    /* ---------- gom điểm thành khối ---------- */
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    function cluster() {
+      const R = +radEl.value, a = [...pts].map(([id, p]) => ({ id, x: p.x, y: p.y })), seen = new Set(), out = [];
+      for (const p of a) {
+        if (seen.has(p.id)) continue;
+        const g = [p]; seen.add(p.id);
+        for (let i = 0; i < g.length; i++)for (const q of a) if (!seen.has(q.id) && dist(g[i], q) < R) { seen.add(q.id); g.push(q) }
+        out.push(g);
+      }
+      return out;
+    }
+    function sig(g) {
+      const d = [];
+      for (let i = 0; i < g.length; i++)for (let j = i + 1; j < g.length; j++)d.push(dist(g[i], g[j]));
+      return { n: g.length, d: d.sort((a, b) => a - b) };
+    }
+    function err(a, b) {
+      if (a.n !== b.n) return Infinity;
+      let m = 0;
+      for (let i = 0; i < a.d.length; i++)m = Math.max(m, Math.abs(a.d[i] - b.d[i]) / Math.max(b.d[i], 20));
+      return m;
+    }
+    function match(s) {
+      let best = null, be = TOL;
+      for (const t in samples) for (const x of samples[t]) { const e = err(s, x); if (e < be) { be = e; best = t } }
+      return best;
+    }
+
+    /* ---------- vẽ ---------- */
+    function render() {
+      const groups = cluster(), r = board.getBoundingClientRect();
+      board.querySelectorAll(".dot,.s.live").forEach(n => n.remove());
+      statusEl.textContent = `Điểm chạm: ${pts.size} · Khối: ${groups.length}`;
+      if (pts.size) hint.style.display = "none";
+      for (const p of pts.values()) { const d = document.createElement("div"); d.className = "dot"; d.style.left = p.x - r.left + "px"; d.style.top = p.y - r.top + "px"; board.appendChild(d) }
+
+      if (calib) { doCalib(groups); return }
+
+      const keys = new Set();
+      for (const g of groups) {
+        const s = sig(g), t = match(s);
+        const key = g.map(p => p.id).sort().join("-");
+        const cx = g.reduce((a, p) => a + p.x, 0) / g.length - r.left, cy = g.reduce((a, p) => a + p.y, 0) / g.length - r.top;
+        if (!t) { statusEl.textContent += ` · Chưa nhận ra (n=${s.n}, d=${s.d.map(Math.round).join("/")})`; continue }
+        keys.add(key);
+        const el = document.createElement("div"); el.className = "s live" + (announced.has(key) ? " old" : "");
+        el.style.left = cx + "px"; el.style.top = cy + "px"; el.innerHTML = svg(t); board.appendChild(el);
+        G.block(t, cx, cy, !announced.has(key));
+        announced.set(key, { t, x: cx, y: cy });
+      }
+      for (const [k, v] of announced) if (!keys.has(k)) {
+        G.lift(v.t);
+        if (keepEl.checked) { const el = document.createElement("div"); el.className = "s old"; el.style.left = v.x + "px"; el.style.top = v.y + "px"; el.innerHTML = svg(v.t); board.appendChild(el) }
+        announced.delete(k);
+      }
+    }
+
+    /* ---------- học khối ---------- */
+    function doCalib(groups) {
+      const name = SHAPES[calib].name;
+      if (groups.length !== 1) { clearTimeout(calibT); calibKey = ""; statusEl.textContent = `Đang học ${name}: hãy đặt đúng 1 khối lên màn hình, giữ yên…`; return }
+      const s = sig(groups[0]), k = s.n + ":" + s.d.map(Math.round).join(",");
+      statusEl.textContent = `Đang học ${name}: thấy ${s.n} điểm, giữ yên…`;
+      if (k !== calibKey) {
+        calibKey = k; clearTimeout(calibT); calibT = setTimeout(() => {
+          let clash = null;
+          for (const t in samples) if (t !== calib) for (const x of samples[t]) if (err(s, x) < TOL) clash = t;
+          samples[calib].push(s); save();
+          statusEl.textContent = `Đã lưu mẫu cho ${name} (${s.n} điểm).` + (clash ? ` Cảnh báo: giống ${SHAPES[clash].name}, dễ nhận nhầm.` : "") + " Nhấc khối ra; đặt lại vài lần để học thêm hoặc bấm nút để thoát.";
+          beep(SHAPES[calib].freq); buildCals();
+        }, 600)
+      }
+    }
+    function buildCals() {
+      const box = document.getElementById("cals"); box.innerHTML = "";
+      for (const t in SHAPES) {
+        const b = document.createElement("button"); b.textContent = `${SHAPES[t].name.replace("hình ", "")} (${samples[t].length})`;
+        if (calib === t) b.classList.add("on");
+        b.onclick = () => { calib = calib === t ? null : t; calibKey = ""; statusEl.textContent = calib ? `Đặt khối ${SHAPES[t].name} lên màn hình…` : ""; buildCals() };
+        box.appendChild(b);
+      }
+    }
+    document.getElementById("reset").onclick = () => { samples = { circle: [], square: [], triangle: [] }; save(); buildCals(); statusEl.textContent = "Đã xóa dữ liệu học." };
+    radEl.oninput = () => { document.getElementById("radv").textContent = radEl.value; sched() };
+    buildCals();
+    /* ===== TRÒ CHƠI ===== */
+    const T = Object.keys(SHAPES), hud = document.getElementById("hud"), rnd = a => a[Math.floor(Math.random() * a.length)];
+    let mode = "free", score = 0, st = {}, G;
+    const hudSet = h => { hud.innerHTML = h };
+    const ok = () => { confetti();[523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f), i * 110)) }, no = () => { beep(180); shake() };
+    const svgO = t => `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="7 6">${SHAPES[t].svg.replace(/ stroke(-linejoin|-width)?="[^"]*"/g, "")}</svg>`;
+    const clearTg = () => board.querySelectorAll(".tg,.animal").forEach(e => e.remove());
+    function end(m, sp) { hudSet(`${m}<br><button onclick="setMode(mode)">Chơi lại</button>`); ok(); say(sp) }
+
+    /* 1. Chơi tự do */
+    const gFree = { block(t, x, y, n) { if (n) { beep(SHAPES[t].freq); say(SHAPES[t].name) } }, lift() { } };
+
+    /* 2. Tìm hình: app đọc tên, bé đặt đúng khối */
+    const gFind = {
+      start() { score = 0; st = { r: 0 }; this.next() },
+      next() {
+        if (st.r >= 8) return end(`Hoàn thành! Con được ${score}/8 ⭐`, "Hoàn thành! Giỏi quá!");
+        st.r++; st.want = rnd(T); st.miss = 0; st.lock = 0;
+        hudSet(`<div class="big">${svg(st.want)}</div>Tìm ${SHAPES[st.want].name}! (${st.r}/8) ⭐${score}`);
+        say("Tìm " + SHAPES[st.want].name)
+      },
+      block(t, x, y, n) {
+        if (!n || st.lock) return;
+        if (t === st.want) { if (!st.miss) score++; st.lock = 1; ok(); say("Đúng rồi!"); setTimeout(() => this.next(), 1600) }
+        else { st.miss = 1; no(); say("Đây là " + SHAPES[t].name + ". Thử lại nhé!") }
+      },
+      lift() { }
+    };
+
+    /* 3. Ghép tranh: đặt khối vào đúng hình mờ */
+    const PICS = [
+      { n: "Ngôi nhà", p: [["triangle", 0, -1.1], ["square", 0, .1], ["circle", 1.7, -1.3]] },
+      { n: "Người tuyết", p: [["circle", 0, -1.3], ["circle", 0, -.1], ["circle", 0, 1.1]] },
+      { n: "Tàu hỏa", p: [["square", -1.2, 0], ["square", 0, 0], ["circle", 1.2, 0], ["triangle", 0, -1.2]] }
+    ];
+    const gPic = {
+      start() { st = { i: 0 }; this.load() },
+      load() {
+        const P = PICS[st.i % PICS.length], r = board.getBoundingClientRect(), u = Math.max(90, Math.min(140, Math.min(r.width, r.height) / 4.2));
+        const xs = P.p.map(a => a[1]), ys = P.p.map(a => a[2]), cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+        clearTg(); st.u = u; st.name = P.n; st.left = P.p.length;
+        st.tg = P.p.map(([t, dx, dy]) => {
+          const x = r.width / 2 + (dx - cx) * u, y = r.height / 2 + (dy - cy) * u, e = document.createElement("div");
+          e.className = "tg"; e.style.cssText = `width:${u}px;height:${u}px;left:${x}px;top:${y}px`; e.innerHTML = svgO(t); board.appendChild(e);
+          return { t, e, x, y, done: 0 }
+        });
+        hudSet(`Ghép tranh: ${P.n}<br>Đặt khối vào đúng hình mờ`); say("Ghép " + P.n)
+      },
+      block(t, x, y, n) {
+        if (!st.left) return;
+        const near = a => !a.done && Math.hypot(a.x - x, a.y - y) < st.u * .6, g = st.tg.find(a => near(a) && a.t === t);
+        if (g) {
+          g.done = 1; g.e.innerHTML = svg(t); g.e.classList.add("done"); beep(SHAPES[t].freq * 1.5);
+          if (--st.left === 0) { ok(); say("Hoàn thành! " + st.name); hudSet(`🎉 ${st.name} hoàn thành!`); setTimeout(() => { st.i++; this.load() }, 3000) }
+        } else if (n && st.tg.some(a => near(a) && a.t !== t)) no();
+      },
+      lift() { }
+    };
+
+    /* 4. Nhớ chuỗi: xem dãy hình rồi đặt khối theo thứ tự */
+    const showProg = () => hudSet(`Con nhớ chuỗi ${st.seq.length} hình: ${st.pos}/${st.seq.length}`);
+    const gMem = {
+      start() { st = { len: 2 }; this.round() },
+      round() {
+        st.seq = Array.from({ length: st.len }, () => rnd(T)); st.pos = 0; st.lock = 1; hudSet("Nhìn kỹ nhé!");
+        st.seq.forEach((t, i) => {
+          setTimeout(() => { hudSet(`<div class="big">${svg(t)}</div>`); beep(SHAPES[t].freq) }, 800 + i * 1100);
+          setTimeout(() => hudSet(""), 1500 + i * 1100)
+        });
+        setTimeout(() => { st.lock = 0; showProg(); say("Đến lượt con!") }, 800 + st.seq.length * 1100)
+      },
+      block(t, x, y, n) {
+        if (!n || st.lock) return;
+        if (t === st.seq[st.pos]) {
+          st.pos++; beep(SHAPES[t].freq); showProg();
+          if (st.pos === st.seq.length) { st.lock = 1; ok(); say("Giỏi lắm!"); st.len++; setTimeout(() => this.round(), 1600) }
+        } else { no(); st.lock = 1; say("Sai rồi, mình thử lại nhé"); setTimeout(() => { st.len = Math.max(2, st.len - 1); this.round() }, 1800) }
+      },
+      lift() { }
+    };
+
+    /* chuyển chế độ */
+    /* 5. Tiggly Safari: ghép khối thành con vật sống động */
+    const found = new Set();
+    try { JSON.parse(localStorage.getItem("tiggly-found") || "[]").forEach(k => found.add(k)) } catch (e) { }
+    const ANI = {
+      "circle,triangle": {
+        n: "Con cá", e: "🐟", c: "fish", say: "Con cá! Bơi bơi bơi", fx: [[660, 0], [880, 130], [700, 260]],
+        svg: "<g class='tail'><polygon points='148,100 196,64 196,136' fill='#fab005'/></g><circle cx='98' cy='100' r='56' fill='#ff922b'/><path d='M66 74q32-28 64 0' stroke='#ffd8a8' stroke-width='8' fill='none' stroke-linecap='round'/><g class='blink'><circle cx='76' cy='94' r='11' fill='#fff'/><circle cx='79' cy='94' r='5' fill='#333'/></g><path d='M62 120q14 12 28 0' stroke='#333' stroke-width='4' fill='none' stroke-linecap='round'/><circle class='bub' cx='34' cy='70' r='7' fill='none' stroke='#74c0fc' stroke-width='3'/><circle class='bub' cx='48' cy='48' r='5' fill='none' stroke='#74c0fc' stroke-width='3' style='animation-delay:.8s'/>"
+      },
+      "square,triangle": {
+        n: "Con mèo", e: "🐱", c: "cat", say: "Con mèo! Meo meo", fx: [[820, 0], [560, 180]],
+        svg: "<polygon points='50,78 52,22 98,66' fill='#ffa94d'/><polygon points='150,78 148,22 102,66' fill='#ffa94d'/><polygon points='58,66 60,40 80,62' fill='#ffc9c9'/><polygon points='142,66 140,40 120,62' fill='#ffc9c9'/><rect x='40' y='62' width='120' height='112' rx='22' fill='#ffc078'/><g class='blink'><circle cx='74' cy='106' r='12' fill='#fff'/><circle cx='76' cy='106' r='6' fill='#333'/></g><g class='blink'><circle cx='126' cy='106' r='12' fill='#fff'/><circle cx='124' cy='106' r='6' fill='#333'/></g><polygon points='92,126 108,126 100,136' fill='#f06595'/><path d='M100 136q-10 12-20 4M100 136q10 12 20 4' stroke='#333' stroke-width='4' fill='none' stroke-linecap='round'/><path d='M40 124l-30-6M40 134l-30 6M160 124l30-6M160 134l30 6' stroke='#333' stroke-width='3' stroke-linecap='round'/>"
+      },
+      "circle,square": {
+        n: "Con rùa", e: "🐢", c: "turtle", say: "Con rùa! Chậm rì rì", fx: [[220, 0], [196, 300]],
+        svg: "<g class='head'><rect x='140' y='82' width='52' height='46' rx='14' fill='#8ce99a'/><circle cx='176' cy='98' r='6' fill='#fff'/><circle cx='178' cy='98' r='3' fill='#333'/><path d='M160 116q10 8 22 0' stroke='#333' stroke-width='3' fill='none' stroke-linecap='round'/></g><rect x='52' y='140' width='30' height='34' rx='8' fill='#8ce99a'/><rect x='112' y='140' width='30' height='34' rx='8' fill='#8ce99a'/><circle cx='96' cy='108' r='62' fill='#40c057'/><circle cx='96' cy='108' r='40' fill='none' stroke='#2f9e44' stroke-width='6'/><path d='M96 68v80M56 108h80' stroke='#2f9e44' stroke-width='5'/>"
+      },
+      "circle,square,triangle": {
+        n: "Gà con", e: "🐥", c: "chick", say: "Gà con! Chíp chíp chíp", fx: [[1500, 0], [1700, 140], [1500, 280]],
+        svg: "<ellipse cx='50' cy='104' rx='12' ry='22' fill='#fcc419'/><ellipse cx='150' cy='104' rx='12' ry='22' fill='#fcc419'/><circle cx='100' cy='92' r='52' fill='#ffd43b'/><path d='M92 44q-4-20 8-22 12 2 8 22' fill='none' stroke='#fab005' stroke-width='5' stroke-linecap='round'/><g class='blink'><circle cx='80' cy='86' r='10' fill='#fff'/><circle cx='82' cy='86' r='5' fill='#333'/></g><g class='blink'><circle cx='120' cy='86' r='10' fill='#fff'/><circle cx='118' cy='86' r='5' fill='#333'/></g><polygon points='88,104 112,104 100,124' fill='#ff922b'/><rect x='34' y='128' width='132' height='56' rx='14' fill='#d9a066'/><path d='M50 146h100M50 164h100' stroke='#b8803f' stroke-width='4'/>"
+      }
+    };
+    const albumHtml = () => `<div class="album">${Object.entries(ANI).map(([k, a]) => `<span class="${found.has(k) ? "" : "lock"}">${a.e}</span>`).join("")}</div>`;
+    const gSaf = {
+      start() { st = { cur: "" }; this.idle() },
+      idle(t) { hudSet((t || "Đặt các khối lên để tạo con vật!") + albumHtml()) },
+      block(t, x, y, n) { if (n) setTimeout(() => this.check(), 150) },
+      lift() { setTimeout(() => this.check(), 150) },
+      check() {
+        const vs = [...announced.values()], ty = [...new Set(vs.map(v => v.t))].sort(), k = ty.join(",");
+        if (k === st.cur) return;
+        st.cur = k; board.querySelectorAll(".animal").forEach(e => e.remove());
+        const a = ANI[k];
+        if (!a) { this.idle(ty.length === 1 ? "Thêm một khối nữa nhé!" : ""); return }
+        const r = board.getBoundingClientRect(), cy = vs.reduce((s, v) => s + v.y, 0) / vs.length, sz = Math.max(150, Math.min(280, Math.min(r.width, r.height) * .5));
+        const e = document.createElement("div"); e.className = "animal";
+        e.style.cssText = `width:${sz}px;height:${sz}px;left:${r.width / 2}px;top:${cy > r.height / 2 ? r.height * .38 : r.height * .68}px`;
+        e.innerHTML = `<svg viewBox='0 0 200 200' class='an-${a.c}'>${a.svg}</svg>`; board.appendChild(e);
+        a.fx.forEach(([f, d]) => setTimeout(() => beep(f), d)); say(a.say);
+        const isNew = !found.has(k); found.add(k);
+        try { localStorage.setItem("tiggly-found", JSON.stringify([...found])) } catch (er) { }
+        hudSet(`${a.n} ${a.e}${isNew ? " – mới!" : ""}` + albumHtml()); if (isNew) ok();
+      }
+    };
+    const MODES = { free: ["Chơi tự do", gFree], find: ["Tìm hình", gFind], pic: ["Ghép tranh", gPic], mem: ["Nhớ chuỗi", gMem], saf: ["Tiggly Safari", gSaf] };
+    function setMode(m) {
+      { const id = setTimeout(() => { }, 0); for (let i = 0; i <= id; i++)clearTimeout(i) }
+      mode = m; G = MODES[m][1]; calib = null; buildCals(); clearTg();
+      board.querySelectorAll(".s").forEach(e => e.remove()); announced.clear();
+      keepEl.checked = m === "free"; hudSet(""); hint.style.display = m === "free" && !pts.size ? "grid" : "none";
+      document.querySelectorAll("#games button").forEach(b => b.classList.toggle("on", b.dataset.m === m));
+      if (G.start) G.start();
+    }
+    for (const m in MODES) { const b = document.createElement("button"); b.textContent = MODES[m][0]; b.dataset.m = m; b.onclick = () => setMode(m); document.getElementById("games").appendChild(b) }
+    setMode("free");
+
+    /* ===== GIAO DIỆN ===== */
+    const home = document.getElementById("games"), bar = document.getElementById("bar"), titleEl = document.getElementById("title"), gear = document.getElementById("gear");
+    hint.textContent = "Đặt khối lên đây nhé!";
+    function confetti() { for (let i = 0; i < 28; i++) { const c = document.createElement("i"); c.className = "cf"; c.style.left = Math.random() * 100 + "vw"; c.style.background = rnd(["#ff6b6b", "#fab005", "#40c057", "#4dabf7", "#cc5de8"]); c.style.animationDelay = Math.random() * .4 + "s"; c.style.animationDuration = 1.2 + Math.random() + "s"; c.addEventListener("animationend", () => c.remove()); document.body.appendChild(c) } }
+    function shake() { board.classList.remove("shake"); void board.offsetWidth; board.classList.add("shake") }
+
+    /* màn hình chính */
+    const TILE = { free: ["#ff6b6b", "🎨", "Vẽ cùng khối"], find: ["#4dabf7", "🔍", "Tìm đúng hình"], pic: ["#fab005", "🧩", "Ghép bức tranh"], saf: ["#ff922b", "🦁", "Khám phá động vật"], mem: ["#40c057", "🧠", "Nhớ thứ tự"] };
+    document.querySelectorAll("#games button").forEach(b => {
+      const m = b.dataset.m, [c, ic, sub] = TILE[m], go = b.onclick;
+      b.className = "tile"; b.style.background = c;
+      b.innerHTML = `<span class="ic">${ic}</span><span>${MODES[m][0]}</span><small>${sub}</small>`;
+      b.onclick = () => { go(); document.body.classList.remove("home"); titleEl.textContent = MODES[m][0] + " " + ic };
+    });
+    const logo = document.createElement("div"); logo.className = "logo";
+    logo.innerHTML = [..."Tiggly"].map((ch, i) => `<span style="color:${["#ff6b6b", "#fab005", "#40c057", "#4dabf7", "#cc5de8", "#ff922b"][i]}">${ch}</span>`).join("") + "<small>Học hình cùng các khối</small>";
+    home.prepend(logo);
+    ["circle", "square", "triangle"].forEach((t, i) => { const d = document.createElement("div"); d.className = "deco d" + i; d.innerHTML = svg(t); home.appendChild(d) });
+    document.body.classList.add("home");
+    document.getElementById("homeBtn").onclick = () => { setMode("free"); document.body.classList.add("home") };
+
+    /* khu vực phụ huynh: giữ nút bánh r+ 1 giây */
+    const scrim = document.createElement("div"); scrim.id = "scrim"; scrim.hidden = true; document.body.appendChild(scrim);
+    const h2 = document.createElement("h2"), pp = document.createElement("p"), xb = document.createElement("button");
+    h2.textContent = "Dành cho phụ huynh"; pp.textContent = "Bấm tên hình rồi đặt đúng khối thật lên màn hình để máy học (nên học 2-3 lần mỗi khối).";
+    xb.textContent = "Xong"; xb.className = "done";
+    bar.prepend(h2, pp); bar.append(statusEl, xb);
+    const _bc = buildCals; buildCals = () => { _bc(); document.body.classList.toggle("cal", !!calib); scrim.hidden = !!calib || bar.hidden };
+    const openP = () => { bar.hidden = false; scrim.hidden = !!calib }, closeP = () => { bar.hidden = scrim.hidden = true; calib = null; buildCals() };
+    xb.onclick = scrim.onclick = closeP;
+    let gt; gear.oncontextmenu = e => e.preventDefault();
+    gear.onpointerdown = () => { gt = setTimeout(openP, 1000) };
+    ["pointerup", "pointerleave", "pointercancel"].forEach(n => gear.addEventListener(n, () => clearTimeout(gt)));
+  </script>
+</body>
+
+</html>
