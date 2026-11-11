@@ -1,5 +1,5 @@
 /* Danh sách trò chơi (MODES) và chuyển chế độ */
-const MODES={free:["Chơi tự do",gFree],find:["Tìm hình",gFind],pic:["Ghép tranh",gPic],mem:["Nhớ chuỗi",gMem],saf:["Tiggly Safari",gSaf]};
+const MODES={free:["Chơi tự do",gFree],find:["Tìm hình",gFind],pic:["Ghép tranh",gPic],mem:["Nhớ chuỗi",gMem],saf:["Tiggly Safari",gSaf],count:["Đếm số",gCount],pat:["Tìm quy luật",gPat],riddle:["Câu đố hình",gRiddle],bal:["Bóng bay",gBalloon]};
 function setMode(m){
  {const id=setTimeout(()=>{},0);for(let i=0;i<=id;i++)clearTimeout(i)}
  tipEl.hidden=true;galEl.hidden=true;mode=m;G=MODES[m][1];calib=null;buildCals();clearTg();

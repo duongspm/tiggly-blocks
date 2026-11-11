@@ -1,5 +1,5 @@
 /* màn hình chính */
-const TILE={free:["#ff6b6b","🎨","Vẽ cùng khối"],find:["#4dabf7","🔍","Tìm đúng hình"],pic:["#fab005","🧩","Ghép bức tranh"],saf:["#ff922b","🦁","Khám phá động vật"],mem:["#40c057","🧠","Nhớ thứ tự"]};
+const TILE={free:["#ff6b6b","🎨","Vẽ cùng khối"],find:["#4dabf7","🔍","Tìm đúng hình"],pic:["#fab005","🧩","Ghép bức tranh"],count:["#845ef7","🔢","Đếm số"],pat:["#20c997","🔁","Hình tiếp theo"],riddle:["#e64980","❓","Câu đố hình"],bal:["#339af0","🎈","Bắn bóng bay"],saf:["#ff922b","🦁","Khám phá động vật"],mem:["#40c057","🧠","Nhớ thứ tự"]};
 document.querySelectorAll("#games button").forEach(b=>{
  const m=b.dataset.m,[c,ic,sub]=TILE[m],go=b.onclick;
  b.className="tile";b.style.background=c;

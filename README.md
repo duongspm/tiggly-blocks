@@ -21,10 +21,14 @@ js/core/              lõi nhận diện khối
 js/games/             mỗi trò một file
   common.js           biến/hàm dùng chung (hudSet, ok, no, end...)
   free.js  find.js  pictures.js  memory.js  safari.js
+  count.js  pattern.js  riddle.js  balloon.js
 js/modes.js           danh sách MODES + setMode()
 js/ui/                màn hình chính, khu vực phụ huynh, hiệu ứng
 ```
 Các file JS là script thường (không phải module) và dùng chung biến toàn cục, nên **thứ tự thẻ `<script>` trong `index.html` quan trọng**. Giữ nguyên thứ tự: core, games, modes, ui.
+
+## Gộp thành 1 file
+`python3 build.py` tạo `dist/tiggly-blocks.html` tự chứa (dùng khi nơi đăng chỉ nhận một file).
 
 ## Việc hay làm
 - **Thêm khối mới:** thêm một mục vào `SHAPES` (`js/core/config.js`) và một khóa rỗng vào `samples` ở cùng file và ở nút "Xóa dữ liệu học" (`js/core/calibration.js`). Sau đó vào khu vực phụ huynh để học khối.
