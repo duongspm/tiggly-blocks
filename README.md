@@ -11,7 +11,9 @@ Mở `index.html` trên iPad/tablet/điện thoại cảm ứng. Nếu mở bằ
 ```
 index.html            khung trang + thứ tự nạp script
 css/style.css         toàn bộ giao diện (luật sau ghi đè luật trước)
+img/ogp.jpg           ảnh banner (màn hình chính + ảnh chia sẻ)
 js/core/              lõi nhận diện khối
+  scenes.js           nền SVG sống động + SCENE_OF (trò nào dùng nền nào)
   config.js           SHAPES (màu, âm, SVG), ngưỡng, biến trạng thái
   storage.js          lưu/đọc dữ liệu học khối (localStorage)
   helpers.js          beep, say (giọng nói), svg()
@@ -21,11 +23,19 @@ js/core/              lõi nhận diện khối
 js/games/             mỗi trò một file
   common.js           biến/hàm dùng chung (hudSet, ok, no, end...)
   free.js  find.js  pictures.js  memory.js  safari.js
-  count.js  pattern.js  riddle.js  balloon.js
+  count.js  pattern.js  riddle.js  balloon.js  draw.js
 js/modes.js           danh sách MODES + setMode()
 js/ui/                màn hình chính, khu vực phụ huynh, hiệu ứng
 ```
 Các file JS là script thường (không phải module) và dùng chung biến toàn cục, nên **thứ tự thẻ `<script>` trong `index.html` quan trọng**. Giữ nguyên thứ tự: core, games, modes, ui.
+
+## Cách nhận diện khối
+- Mỗi khối có vài điểm chạm cố định (thường 3), khác nhau về **khoảng cách và vị trí** giữa các điểm.
+- "Chữ ký" của khối = các khoảng cách giữa mọi cặp điểm, xếp tăng dần (không phụ thuộc hướng xoay).
+- Khi có nhiều điểm chạm, `findBlocks()` (`js/core/input.js`) thử mọi nhóm điểm đủ gần nhau, so với mẫu đã học, rồi chọn tập nhóm không trùng điểm phủ được nhiều điểm nhất và sai số nhỏ nhất. Vì vậy **nhiều khối đặt cùng lúc, kể cả sát nhau, vẫn tách được**.
+- Khối phải ổn định 90 ms mới tính là "mới đặt" và mất điểm 200 ms mới tính là "nhấc lên" (`CONFIRM_MS`, `LIFT_MS` trong `js/core/render.js`).
+- Sai số cho phép chỉnh ở khu vực phụ huynh (mặc định 18%). Nút "Kiểm tra độ phân biệt" cho biết các khối có đủ khác nhau không.
+- Giới hạn phần cứng: iPad nhận tối đa khoảng 11 điểm chạm cùng lúc, nên 3 khối (9 điểm) luôn ổn, 4 khối (12 điểm) có thể không đủ.
 
 ## Gộp thành 1 file
 `python3 build.py` tạo `dist/tiggly-blocks.html` tự chứa (dùng khi nơi đăng chỉ nhận một file).

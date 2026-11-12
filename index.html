@@ -2,12 +2,13 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<!-- Responsive -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <!-- Responsive -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- SEO cơ bản -->
-  <title>Tiggly Blocks – Trò Chơi Học Hình Khối Cho Bé</title>
+  <title>Tiggly Blocks – by Duongg Trò Chơi Học Hình Khối Cho Bé</title>
 
   <meta name="description"
     content="Tiggly Blocks là trò chơi giáo dục tương tác dành cho trẻ nhỏ. Bé khám phá hình tròn, hình vuông, tam giác, ghép hình sáng tạo và phát triển tư duy qua những trò chơi thú vị.">
@@ -39,29 +40,29 @@
 
   <meta property="og:site_name" content="Tiggly Blocks">
 
-  <meta property="og:title" content="Tiggly Blocks – Chơi, Học và Sáng Tạo Cùng Hình Khối">
+  <meta property="og:title" content="Tiggly Blocks – by Duongg Chơi, Học và Sáng Tạo Cùng Hình Khối">
 
   <meta property="og:description"
     content="Cùng bé khám phá thế giới hình khối, ghép hình sáng tạo và học hỏi qua những trò chơi giáo dục tương tác vui nhộn.">
 
   <meta property="og:url" content="https://tiggly-blocks.vercel.app/">
 
-  <meta property="og:image" content="https://tiggly-blocks.vercel.app/images/ogp.jpg">
+  <meta property="og:image" content="https://tiggly-blocks.vercel.app/images/ogp.png">
 
   <meta property="og:image:width" content="1200">
 
   <meta property="og:image:height" content="630">
 
-  <meta property="og:image:alt" content="Tiggly Blocks – Trò chơi giáo dục hình khối cho bé">
+  <meta property="og:image:alt" content="Tiggly Blocks – by Duongg Trò chơi giáo dục hình khối cho bé">
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
 
-  <meta name="twitter:title" content="Tiggly Blocks – Chơi, Học và Sáng Tạo">
+  <meta name="twitter:title" content="Tiggly Blocks – by Duongg Chơi, Học và Sáng Tạo">
 
   <meta name="twitter:description" content="Khám phá hình khối, ghép hình và sáng tạo cùng Tiggly Blocks.">
 
-  <meta name="twitter:image" content="https://tiggly-blocks.vercel.app/images/ogp.jpg">
+  <meta name="twitter:image" content="https://tiggly-blocks.vercel.app/images/ogp.png">
 
   <!-- Structured Data: Google -->
   <script type="application/ld+json">
@@ -87,11 +88,12 @@
   <span>Học khối:</span>
   <span id="cals"></span>
   <button id="reset">Xóa dữ liệu học</button>
+  <button id="sep">Kiểm tra độ phân biệt</button>
   <label><input type="checkbox" id="keep" checked> Giữ hình khi nhấc khối</label>
-  <label>Khoảng gom điểm <input type="range" id="rad" min="60" max="300" value="140"><span id="radv">140</span></label>
+  <label>Sai số nhận diện (%) <input type="range" id="rad" min="8" max="35" value="18"><span id="radv">18</span></label>
 </div>
 <div id="status"></div>
-<div id="games"></div>
+<div id="games"><p class="learn">Học: nhận biết hình · phân loại · tư duy ghép hình · động vật</p></div>
 <div id="top"><button id="homeBtn" aria-label="Màn hình chính">🏠</button><div id="title"></div><span id="stars">⭐ 0</span><button id="gear" aria-label="Dành cho phụ huynh (giữ 1 giây)">⚙️</button></div>
 <div id="board"><div id="hud"></div><div id="hint">Đặt khối lên đây nhé!</div></div>
 <script src="js/core/config.js"></script>
@@ -100,6 +102,7 @@
 <script src="js/core/input.js"></script>
 <script src="js/core/render.js"></script>
 <script src="js/core/calibration.js"></script>
+<script src="js/core/scenes.js"></script>
 <script src="js/games/common.js"></script>
 <script src="js/games/free.js"></script>
 <script src="js/games/find.js"></script>
@@ -110,6 +113,7 @@
 <script src="js/games/pattern.js"></script>
 <script src="js/games/riddle.js"></script>
 <script src="js/games/balloon.js"></script>
+<script src="js/games/draw.js"></script>
 <script src="js/modes.js"></script>
 <script src="js/ui/base.js"></script>
 <script src="js/ui/home.js"></script>

@@ -25,11 +25,16 @@ const ANI={
  "circle,square,star,triangle":{n:"Con voi",e:"🐘",c:"elephant",say:"Con voi! Pao pao",fx:[[330,0],[520,160],[420,320]],
   svg:"<circle cx='42' cy='88' r='36' fill='#ced4da'/><circle cx='158' cy='88' r='36' fill='#ced4da'/><circle cx='100' cy='88' r='58' fill='#adb5bd'/><g class='trunk'><path d='M100 112v52q0 20 20 16' stroke='#adb5bd' stroke-width='26' fill='none' stroke-linecap='round'/></g><polygon points='78,128 70,160 90,142' fill='#fff'/><polygon points='122,128 130,160 110,142' fill='#fff'/><g class='blink'><circle cx='78' cy='82' r='9' fill='#fff'/><circle cx='80' cy='82' r='4' fill='#333'/></g><g class='blink'><circle cx='122' cy='82' r='9' fill='#fff'/><circle cx='120' cy='82' r='4' fill='#333'/></g><polygon points='100,36 104,46 115,46 106,53 110,64 100,57 90,64 94,53 85,46 96,46' fill='#4dabf7'/>"}
 };
-const albumHtml=()=>`<div class="album">${Object.entries(ANI).map(([k,a])=>`<span data-k="${k}" class="${found.has(k)?"":"lock"}">${a.e}</span>`).join("")}</div>`;
+/* Phân loại theo nơi sống: dưới biển / trên cạn / trên trời */
+const HAB={"circle,triangle":"sea","square,star":"sea","circle,star":"sea","star,triangle":"sky"}; /* còn lại: trên cạn */
+const habOf=k=>HAB[k]||"land";
+const HABN={sea:"🌊 Dưới biển",land:"🌳 Trên cạn",sky:"☁️ Trên trời"};
+const SCENE_HAB={sea:"sea",land:"safari",sky:"sky"};
+const albumHtml=()=>`<div class="album">${Object.keys(HABN).map(h=>`<b>${HABN[h].slice(0,2)}</b>`+Object.entries(ANI).filter(([k])=>habOf(k)===h).map(([k,a])=>`<span data-k="${k}" class="${found.has(k)?"":"lock"}">${a.e}</span>`).join("")).join("")}</div>`;
 const tipEl=document.createElement("div");tipEl.id="tip";tipEl.hidden=true;board.appendChild(tipEl);
 function showTip(k){
  const a=ANI[k];if(!a)return;
- tipEl.innerHTML=`<b>${a.e} ${a.n}</b><div class="tshapes">${k.split(",").map(t=>`<span class="tsh">${svg(t)}<small>${SHAPES[t].name.replace("hình ","")}</small></span>`).join("<i>+</i>")}</div><small>Gợi ý: đặt các khối này cùng lúc nhé!</small><button>Đã hiểu</button>`;
+ tipEl.innerHTML=`<b>${a.e} ${a.n}</b><div class="tshapes">${k.split(",").map(t=>`<span class="tsh">${svg(t)}<small>${SHAPES[t].name.replace("hình ","")}</small></span>`).join("<i>+</i>")}</div><small>Sống ở: ${HABN[habOf(k)]}</small><br><small>Gợi ý: đặt các khối này cùng lúc nhé!</small><button>Đã hiểu</button>`;
  tipEl.hidden=false;
 }
 hud.addEventListener("pointerdown",e=>e.stopPropagation());
@@ -51,7 +56,7 @@ const gSaf={
   const e=document.createElement("div");e.className="animal";
   e.style.cssText=`width:${sz}px;height:${sz}px;left:${r.width/2}px;top:${cy>r.height/2?r.height*.38:r.height*.68}px`;
   e.innerHTML=`<svg viewBox='0 0 200 200' class='an-${a.c}'>${a.svg}</svg>`;board.appendChild(e);e.onpointerdown=ev=>ev.stopPropagation();e.onclick=()=>{showTip(k);a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say)};
-  a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say);
+  a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say);setScene(SCENE_HAB[habOf(k)]);
   const isNew=!found.has(k);found.add(k);
   try{localStorage.setItem("tiggly-found",JSON.stringify([...found]))}catch(er){}
   hudSet(`${a.n} ${a.e}${isNew?" – mới!":""}`+albumHtml());if(isNew)ok();

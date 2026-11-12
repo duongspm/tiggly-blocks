@@ -8,6 +8,8 @@ css=(root/"css/style.css").read_text(encoding="utf-8")
 html=html.replace('<link rel="stylesheet" href="css/style.css">',f"<style>\n{css}</style>")
 def inline(m):
     return f'<script>\n/* {m.group(1)} */\n{(root/m.group(1)).read_text(encoding="utf-8")}</script>'
+import base64
+html=re.sub(r'src="(img/[^"]+)"',lambda m:'src="data:image/jpeg;base64,'+base64.b64encode((root/m.group(1)).read_bytes()).decode()+'"',html)
 html=re.sub(r'<script src="([^"]+)"></script>',inline,html)
 out=pathlib.Path(sys.argv[1]) if len(sys.argv)>1 else root/"dist/tiggly-blocks.html"
 out.parent.mkdir(parents=True,exist_ok=True);out.write_text(html,encoding="utf-8");print("OK",out,len(html),"bytes")
