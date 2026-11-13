@@ -4,7 +4,7 @@ document.querySelectorAll("#games button").forEach(b=>{
  const m=b.dataset.m,[c,ic,sub]=TILE[m],go=b.onclick;
  b.className="tile";b.style.background=c;
  b.innerHTML=`<span class="ic">${ic}</span><span>${MODES[m][0]}</span><small>${sub}</small>`;
- b.onclick=()=>{go();document.body.classList.remove("home");titleEl.textContent=MODES[m][0]+" "+ic};
+ b.onclick=ev=>transitionTo(c,ev,()=>{go();document.body.classList.remove("home");titleSwap(MODES[m][0]+" "+ic);playEnter()});
 });
 const logo=document.createElement("div");logo.className="brand";
 logo.innerHTML=`<span class="bstar">★</span><div class="b1">Tiggly</div><div class="b2">Blocks</div><i class="bline"></i><div class="btag">Chơi · Học · Sáng tạo</div><div class="bby">by Duongg</div>`;
@@ -19,5 +19,5 @@ CATS.forEach(([ic,nm,c,ms])=>{
 });
 ["circle","square","triangle","star"].forEach((t,i)=>{const d=document.createElement("div");d.className="deco d"+i;d.innerHTML=svg(t);home.appendChild(d)});
 document.body.classList.add("home");
-document.getElementById("homeBtn").onclick=()=>{setMode("free");document.body.classList.add("home")};
+document.getElementById("homeBtn").onclick=ev=>transitionTo("#4dabf7",ev,()=>{setMode("free");document.body.classList.add("home");titleSwap("")});
 

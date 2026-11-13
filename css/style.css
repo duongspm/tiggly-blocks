@@ -187,3 +187,25 @@ body.home #games{display:flex;flex-direction:column;flex-wrap:nowrap;justify-con
 .deco{width:84px;height:84px;opacity:.7;z-index:0}
 .d3{right:10%;bottom:10%;animation-delay:3s}
 .learn,.cat{position:relative;z-index:1}
+
+/* ===== Hiệu ứng chuyển màn hình (chỉ dùng transform/opacity để không giật) ===== */
+#wipe{position:fixed;inset:0;z-index:100;pointer-events:none;opacity:0;background:var(--veil);will-change:opacity}
+#wipe.on{pointer-events:auto}
+#title.swap{animation:titlein .7s ease-in-out}
+#hud{animation:hudin .6s ease-in-out}
+.bgl{position:absolute;inset:0;z-index:0;pointer-events:none;background-size:cover;background-position:center bottom;background-repeat:no-repeat;opacity:0;transition:opacity 1s ease-in-out}
+.dot,.s{will-change:transform}
+.bal,.cf,.animal{will-change:transform}
+@keyframes titlein{from{opacity:0}to{opacity:1}}
+@keyframes hudin{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+:root{--veil:#f3f9ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--veil:#1b2a49}}
+:root[data-theme="dark"]{--veil:#1b2a49}
+/* Safari: con vật ở lại, kéo/nhảy/mờ đi */
+.animal{touch-action:none;cursor:grab}
+.animal.jump{animation:jump .55s ease-out}
+.animal.bye{animation:bye .6s ease-in-out forwards;pointer-events:none}
+@keyframes jump{0%,100%{transform:translate(-50%,-50%)}40%{transform:translate(-50%,-72%) scale(1.08)}}
+@keyframes bye{to{opacity:0;transform:translate(-50%,-50%) scale(.9)}}

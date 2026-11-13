@@ -1,3 +1,9 @@
+/* Bộ hẹn giờ có sổ theo dõi: clearAllTimers() hủy mọi hẹn giờ của trò cũ ngay lập tức khi đổi màn hình */
+const _setT=window.setTimeout.bind(window),_clrT=window.clearTimeout.bind(window),liveTimers=new Set();
+window.setTimeout=(f,ms,...a)=>{const id=_setT(()=>{liveTimers.delete(id);f(...a)},ms);liveTimers.add(id);return id};
+window.clearTimeout=id=>{liveTimers.delete(id);_clrT(id)};
+function clearAllTimers(){liveTimers.forEach(_clrT);liveTimers.clear()}
+
 /* Cấu hình: các khối hình (màu, âm, SVG), ngưỡng nhận diện, biến trạng thái */
 const SHAPES={
   circle:{name:"hình tròn",color:"#40c057",freq:392,svg:'<circle cx="50" cy="50" r="46"/>'},

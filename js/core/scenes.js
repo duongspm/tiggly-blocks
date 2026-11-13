@@ -9,7 +9,15 @@ const SCENES={
 };
 /* trò nào dùng nền nào */
 const SCENE_OF={free:"meadow",find:"sky",pic:"meadow",mem:"sky",saf:"safari",count:"meadow",pat:"sky",riddle:"meadow",bal:"sky",draw:"meadow"};
+const sceneUri={};
+const uriOf=n=>sceneUri[n]||(sceneUri[n]=`url("data:image/svg+xml,${encodeURIComponent(SCENES[n])}")`);
+/* nạp và giải mã sẵn mọi nền ngay khi mở trang, để lúc đổi nền không phải xử lý ảnh */
+Object.keys(SCENES).forEach(n=>{const im=new Image();im.src=uriOf(n).slice(5,-2);if(im.decode)im.decode().catch(()=>{})});
 function setScene(n){
- if(!SCENES[n])return;board.dataset.scene=n;
- board.style.background=`url("data:image/svg+xml,${encodeURIComponent(SCENES[n])}") center bottom/cover no-repeat`;
+ if(!SCENES[n]||board.dataset.scene===n)return;board.dataset.scene=n;
+ const L=document.createElement("div");L.className="bgl";L.style.backgroundImage=uriOf(n);
+ board.prepend(L);
+ [...board.querySelectorAll(".bgl")].slice(2).forEach(e=>e.remove());
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{L.style.opacity=1}));
+ L.addEventListener("transitionend",()=>{[...board.querySelectorAll(".bgl")].slice(1).forEach(e=>e.remove())},{once:true});
 }

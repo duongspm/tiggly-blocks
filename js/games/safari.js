@@ -42,23 +42,76 @@ hud.addEventListener("click",e=>{const s=e.target.closest("[data-k]");if(s)showT
 tipEl.addEventListener("pointerdown",e=>e.stopPropagation());
 tipEl.addEventListener("click",e=>{if(e.target.tagName==="BUTTON")tipEl.hidden=true});
 const gSaf={
- start(){st={cur:""};this.idle()},
+ start(){st={cur:"",shown:"",fp:null,target:null};this.bind();this.idle()},
  idle(t){hudSet((t||"Đặt các khối lên để tạo con vật!")+albumHtml())},
  block(t,x,y,n){if(n)setTimeout(()=>this.check(),150)},
  lift(){setTimeout(()=>this.check(),150)},
+ animal(){return board.querySelector(".animal:not(.bye)")},
+ bye(e){e.classList.add("bye");e.addEventListener("animationend",()=>e.remove(),{once:true})},
+ next(){ /* nút "Tiếp tục" */
+  board.querySelectorAll(".animal").forEach(e=>this.bye(e));
+  st.cur=st.shown="";tipEl.hidden=true;setScene("safari");this.idle();
+ },
+ poke(k,withTip){ /* tác động: nhảy lên, kêu, (chạm vào thì) hiện gợi ý */
+  const e=this.animal(),a=ANI[k];if(!e||!a)return;
+  e.classList.remove("jump");void e.offsetWidth;e.classList.add("jump");
+  a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say);
+  if(withTip)showTip(k);
+ },
  check(){
   const vs=[...announced.values()],ty=[...new Set(vs.map(v=>v.t))].sort(),k=ty.join(",");
   if(k===st.cur)return;
-  st.cur=k;if(!ty.length)return;tipEl.hidden=true;board.querySelectorAll(".animal").forEach(e=>e.remove());
+  st.cur=k;if(!ty.length)return;                 /* nhấc hết khối: GIỮ con vật */
   const a=ANI[k];
-  if(!a){this.idle(ty.length===1?"Thêm một khối nữa nhé!":"");return}
+  if(!a){if(!st.shown)this.idle(ty.length===1?"Thêm một khối nữa nhé!":"");return}
+  if(k===st.shown){this.poke(k,false);return}    /* đúng tổ hợp đang hiện: chỉ kêu lại */
+  tipEl.hidden=true;
+  board.querySelectorAll(".animal").forEach(e=>this.bye(e));   /* con mới hiện, con cũ mờ đi */
+  st.shown=k;
   const r=board.getBoundingClientRect(),cy=vs.reduce((s,v)=>s+v.y,0)/vs.length,sz=Math.max(150,Math.min(280,Math.min(r.width,r.height)*.5));
   const e=document.createElement("div");e.className="animal";
-  e.style.cssText=`width:${sz}px;height:${sz}px;left:${r.width/2}px;top:${cy>r.height/2?r.height*.38:r.height*.68}px`;
-  e.innerHTML=`<svg viewBox='0 0 200 200' class='an-${a.c}'>${a.svg}</svg>`;board.appendChild(e);e.onpointerdown=ev=>ev.stopPropagation();e.onclick=()=>{showTip(k);a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say)};
+  e._p={x:r.width/2,y:cy>r.height/2?r.height*.38:r.height*.68};
+  e.style.cssText=`width:${sz}px;height:${sz}px;left:0;top:0`;moveTo(e,e._p.x,e._p.y);
+  e.innerHTML=`<svg viewBox='0 0 200 200' class='an-${a.c}'>${a.svg}</svg>`;board.appendChild(e);
   a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say);setScene(SCENE_HAB[habOf(k)]);
   const isNew=!found.has(k);found.add(k);
   try{localStorage.setItem("tiggly-found",JSON.stringify([...found]))}catch(er){}
-  hudSet(`${a.n} ${a.e}${isNew?" – mới!":""}`+albumHtml());if(isNew)ok();
+  hudSet(`${a.n} ${a.e}${isNew?" – mới!":""}<br><small>Chạm hoặc kéo con vật nhé</small><br><button onclick="gSaf.next()">▶ Tiếp tục</button>`+albumHtml());
+  if(isNew)ok();
+ },
+ /* con vật đi theo ngón tay */
+ bind(){
+  if(this.bound)return;this.bound=1;
+  board.addEventListener("pointerdown",e=>{
+   if(mode!=="saf"||announced.size||pts.size!==1)return;
+   const an=this.animal();if(!an)return;
+   const r=board.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,on=!!e.target.closest(".animal");
+   st.fp=e.pointerId;st.on=on;st.moved=0;st.lx=x;st.ly=y;
+   st.ox=on?an._p.x-x:0;st.oy=on?an._p.y-y:0;
+   if(!on)this.follow(x,y);
+  });
+  board.addEventListener("pointermove",e=>{
+   if(e.pointerId!==st.fp)return;
+   const r=board.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+   st.moved+=Math.hypot(x-st.lx,y-st.ly);st.lx=x;st.ly=y;
+   if(!st.on||st.moved>10)this.follow(x+st.ox,y+st.oy);
+  });
+  ["pointerup","pointercancel"].forEach(n=>window.addEventListener(n,e=>{
+   if(e.pointerId!==st.fp)return;st.fp=null;
+   if(st.on&&st.moved<=10&&st.shown)this.poke(st.shown,true);
+  }));
+ },
+ follow(x,y){
+  st.target={x:Math.max(0,Math.min(x,board.clientWidth||9999)),y:Math.max(0,Math.min(y,board.clientHeight||9999))};
+  if(this.raf)return;
+  const step=()=>{
+   const e=this.animal(),t=st.target;
+   if(!e||!t||mode!=="saf"){this.raf=0;return}
+   const p=e._p,dx=t.x-p.x,dy=t.y-p.y;
+   if(Math.hypot(dx,dy)<1){this.raf=0;return}
+   p.x+=dx*.07;p.y+=dy*.07;moveTo(e,p.x,p.y);
+   this.raf=requestAnimationFrame(step);
+  };
+  this.raf=requestAnimationFrame(step);
  }
 };

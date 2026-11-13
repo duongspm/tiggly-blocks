@@ -37,6 +37,13 @@ Các file JS là script thường (không phải module) và dùng chung biến 
 - Sai số cho phép chỉnh ở khu vực phụ huynh (mặc định 18%). Nút "Kiểm tra độ phân biệt" cho biết các khối có đủ khác nhau không.
 - Giới hạn phần cứng: iPad nhận tối đa khoảng 11 điểm chạm cùng lúc, nên 3 khối (9 điểm) luôn ổn, 4 khối (12 điểm) có thể không đủ.
 
+## Hiệu ứng chuyển màn hình và hiệu năng
+- `js/ui/transition.js`: màn hình mờ dần sang một lớp phủ pastel nhạt, đổi màn hình khi đã phủ kín rồi mờ ra (khoảng 1,2 giây, chỉ đổi độ mờ, không phóng to, không trượt). Chỉnh nhanh/chậm ở `FADE_IN`, `HOLD`, `FADE_OUT`. Việc dựng game nặng nằm sau lớp phủ nên không giật.
+- Chỉ animate `transform` và `opacity`. Khối và điểm chạm được dùng lại phần tử và dời bằng `translate`, không tạo/xóa DOM mỗi lần chạm.
+- Nền SVG được nạp sẵn và chuyển mờ chéo (`setScene` trong `js/core/scenes.js`).
+- Mọi `setTimeout` đi qua sổ theo dõi trong `js/core/config.js`; `clearAllTimers()` hủy hẹn giờ của trò cũ khi đổi màn hình.
+- Có hỗ trợ `prefers-reduced-motion` (người dùng tắt hiệu ứng chuyển động trong hệ điều hành).
+
 ## Gộp thành 1 file
 `python3 build.py` tạo `dist/tiggly-blocks.html` tự chứa (dùng khi nơi đăng chỉ nhận một file).
 
