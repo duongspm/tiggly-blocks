@@ -41,76 +41,129 @@ hud.addEventListener("pointerdown",e=>e.stopPropagation());
 hud.addEventListener("click",e=>{const s=e.target.closest("[data-k]");if(s)showTip(s.dataset.k)});
 tipEl.addEventListener("pointerdown",e=>e.stopPropagation());
 tipEl.addEventListener("click",e=>{if(e.target.tagName==="BUTTON")tipEl.hidden=true});
+ANI["circle,triangle"].face=-1; /* con cá được vẽ nhìn sang trái */
 const gSaf={
- start(){st={cur:"",shown:"",fp:null,target:null};this.bind();this.idle()},
- idle(t){hudSet((t||"Đặt các khối lên để tạo con vật!")+albumHtml())},
+ start(){
+  st={list:[],sel:null,prov:null,cur:"",n:0,fp:null,target:null};
+  const old=document.getElementById("cmenu");if(old)old.remove();
+  const cm=this.cm=document.createElement("div");cm.id="cmenu";cm.hidden=true;board.appendChild(cm);
+  cm.addEventListener("pointerdown",e=>e.stopPropagation());
+  cm.addEventListener("click",e=>{
+   const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,x=cm._c;cm.hidden=true;
+   if(a==="del")this.remove(x);else if(a==="all")this.clearAll();
+  });
+  this.bind();this.hud();
+ },
+ hud(t){hudSet((t||"Đặt các khối lên để tạo con vật!")+(st.list.length?`<br><button onclick="gSaf.askClear()">🗑 Xóa tất cả</button>`:"")+albumHtml())},
+ place(el,x,y){
+  x=Math.max(0,Math.min(x,board.clientWidth||9999));y=Math.max(0,Math.min(y,board.clientHeight||9999));
+  const o=el._p;el._p={x,y};moveTo(el,x,y);
+  if(o){this.face(el,x-o.x);this.lean(el,x-o.x)}        /* quay mặt + nghiêng người theo hướng đi */
+ },
+ face(e,dx){ /* đi sang phải/trái đủ ~10px thì lật con vật; ANI[..].face = hướng nhìn của hình vẽ gốc (mặc định 1 = nhìn phải) */
+  e._acc=Math.sign(dx)===Math.sign(e._acc||0)?(e._acc||0)+dx:dx;
+  if(Math.abs(e._acc)<10)return;
+  const d=e._acc>0?1:-1;if(e._dir===d)return;
+  e._dir=d;e.style.scale=`${d*(ANI[e._k].face||1)} 1`;
+ },
+ lean(e,dx){ /* nghiêng tối đa 8° về phía đang đi, rồi thả lỏng dần về thẳng */
+  const set=()=>{e.style.rotate=e._ln+"deg"};
+  e._ln=Math.max(-8,Math.min(8,(e._ln||0)*.6+(Math.abs(dx)<1?0:dx*.5)));set();
+  clearTimeout(e._lt);
+  const relax=()=>{e._ln*=.55;if(Math.abs(e._ln)<.4)e._ln=0;set();if(e._ln)e._lt=setTimeout(relax,40)};
+  e._lt=setTimeout(relax,120);
+ },
+ pos(el){const p=el._p||{x:0,y:0};return [p.x,p.y]},
+ sound(k){const a=ANI[k];a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say)},
  block(t,x,y,n){if(n)setTimeout(()=>this.check(),150)},
  lift(){setTimeout(()=>this.check(),150)},
- animal(){return board.querySelector(".animal:not(.bye)")},
- bye(e){e.classList.add("bye");e.addEventListener("animationend",()=>e.remove(),{once:true})},
- next(){ /* nút "Tiếp tục" */
-  board.querySelectorAll(".animal").forEach(e=>this.bye(e));
-  st.cur=st.shown="";tipEl.hidden=true;setScene("safari");this.idle();
- },
- poke(k,withTip){ /* tác động: nhảy lên, kêu, (chạm vào thì) hiện gợi ý */
-  const e=this.animal(),a=ANI[k];if(!e||!a)return;
-  e.classList.remove("jump");void e.offsetWidth;e.classList.add("jump");
-  a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say);
-  if(withTip)showTip(k);
- },
  check(){
   const vs=[...announced.values()],ty=[...new Set(vs.map(v=>v.t))].sort(),k=ty.join(",");
   if(k===st.cur)return;
-  st.cur=k;if(!ty.length)return;                 /* nhấc hết khối: GIỮ con vật */
+  st.cur=k;if(!ty.length)return;                           /* nhấc khối ra: các con vật vẫn ở lại */
   const a=ANI[k];
-  if(!a){if(!st.shown)this.idle(ty.length===1?"Thêm một khối nữa nhé!":"");return}
-  if(k===st.shown){this.poke(k,false);return}    /* đúng tổ hợp đang hiện: chỉ kêu lại */
+  if(!a){if(!st.prov&&!st.list.length)this.hud(ty.length===1?"Thêm một khối nữa nhé!":"");return}
+  if(st.prov&&st.prov._k===k){this.sound(k);return}        /* đặt lại đúng tổ hợp đang ghép: chỉ kêu lại */
+  if(st.list.length-(st.prov?1:0)>=6){say("Nhiều con vật quá, hãy xóa bớt nhé");return}
+  if(st.prov)this.remove(st.prov,true);                    /* con đang ghép dở bị thay bằng con mới */
   tipEl.hidden=true;
-  board.querySelectorAll(".animal").forEach(e=>this.bye(e));   /* con mới hiện, con cũ mờ đi */
-  st.shown=k;
-  const r=board.getBoundingClientRect(),cy=vs.reduce((s,v)=>s+v.y,0)/vs.length,sz=Math.max(150,Math.min(280,Math.min(r.width,r.height)*.5));
-  const e=document.createElement("div");e.className="animal";
-  e._p={x:r.width/2,y:cy>r.height/2?r.height*.38:r.height*.68};
-  e.style.cssText=`width:${sz}px;height:${sz}px;left:0;top:0`;moveTo(e,e._p.x,e._p.y);
-  e.innerHTML=`<svg viewBox='0 0 200 200' class='an-${a.c}'>${a.svg}</svg>`;board.appendChild(e);
-  a.fx.forEach(([f,d])=>setTimeout(()=>beep(f),d));say(a.say);setScene(SCENE_HAB[habOf(k)]);
+  const r=board.getBoundingClientRect(),cy=vs.reduce((s,v)=>s+v.y,0)/vs.length,sz=Math.max(140,Math.min(260,Math.min(r.width,r.height)*.45));
+  const e=document.createElement("div");e.className="animal";e._k=k;e._fin=0;
+  e.style.cssText=`width:${sz}px;height:${sz}px;left:0;top:0`;
+  e.innerHTML=`<svg viewBox='0 0 200 200' class='an-${a.c}'>${a.svg}</svg>`;
+  const bar=document.createElement("div");bar.className="cbar";bar.innerHTML=`<button class="fin">✅ Hoàn thành</button>`;e.appendChild(bar);e._bar=bar;
+  bar.addEventListener("pointerdown",ev=>ev.stopPropagation());
+  bar.addEventListener("click",ev=>{if(ev.target.closest(".fin"))this.finish(e)});
+  e.onpointerdown=ev=>{ev.stopPropagation();e.setPointerCapture(ev.pointerId);this.startDrag(e,ev)};
+  board.appendChild(e);
+  this.place(e,r.width*[.5,.25,.75][st.n++%3],cy>r.height/2?r.height*.38:r.height*.68);
+  st.list.push(e);st.prov=e;this.select(e);
+  this.sound(k);setScene(SCENE_HAB[habOf(k)]);
   const isNew=!found.has(k);found.add(k);
   try{localStorage.setItem("tiggly-found",JSON.stringify([...found]))}catch(er){}
-  hudSet(`${a.n} ${a.e}${isNew?" – mới!":""}<br><small>Chạm hoặc kéo con vật nhé</small><br><button onclick="gSaf.next()">▶ Tiếp tục</button>`+albumHtml());
-  if(isNew)ok();
+  this.hud(`${a.n} ${a.e}${isNew?" – mới!":""}<br><small>Ghép xong thì bấm ✅ Hoàn thành nhé</small>`);
  },
- /* con vật đi theo ngón tay */
+ finish(e){ /* bấm Hoàn thành: con vật "sống dậy", di chuyển được */
+  const a=ANI[e._k];e._fin=1;e._bar.hidden=true;e.classList.add("done");if(st.prov===e)st.prov=null;
+  this.select(e);ok();say("Hoàn thành! "+a.n+" đã sống dậy");this.hop(e);
+  this.hud(`${a.n} ${a.e} đã sống dậy!<br><small>Chạm, kéo con vật hoặc chạm chỗ trống để nó đi tới</small>`);
+ },
+ select(e){st.sel=e;st.list.forEach(k=>k.classList.toggle("sel",k===e))},
+ hop(e){if(e.animate)e.animate([{transform:"translate(-50%,-50%)"},{transform:"translate(-50%,-85%) scale(1.08)"},{transform:"translate(-50%,-50%)"}],{duration:520,easing:"ease-out"})},
+ tap(e){this.select(e);if(e._fin){this.hop(e);this.sound(e._k)}},   /* chạm vào con vật đã xong: nhảy + kêu, KHÔNG hiện gợi ý */
+ /* kéo con vật; giữ lâu (không kéo) = mở tùy chọn; chạm nhẹ = chọn/tác động */
+ startDrag(el,e){
+  const r=board.getBoundingClientRect(),[cx,cy]=this.pos(el),ox=cx-(e.clientX-r.left),oy=cy-(e.clientY-r.top);
+  let moved=0,lx=e.clientX,ly=e.clientY,menu=0,lp=setTimeout(()=>{lp=0;menu=1;this.menu(el)},600);
+  el.style.zIndex=9;
+  el.onpointermove=m=>{
+   moved+=Math.hypot(m.clientX-lx,m.clientY-ly);lx=m.clientX;ly=m.clientY;
+   if(menu||moved<=5)return;
+   if(lp){clearTimeout(lp);lp=0}
+   this.place(el,m.clientX-r.left+ox,m.clientY-r.top+oy);
+  };
+  el.onpointerup=el.onpointercancel=()=>{
+   el.onpointermove=el.onpointerup=el.onpointercancel=null;el.style.zIndex="";if(lp)clearTimeout(lp);
+   if(!menu&&moved<=5)this.tap(el);
+  };
+ },
+ /* tùy chọn khi giữ lâu / xóa */
+ menu(e){
+  const cm=this.cm,a=ANI[e._k],[x,y]=this.pos(e);cm._c=e;
+  cm.innerHTML=`<b>${a.e} ${a.n}</b><div><button data-a="del">🗑 Xóa</button><button data-a="x">Đóng</button></div>`;
+  cm.style.left=x+"px";cm.style.top=Math.max(110,y-110)+"px";cm.hidden=false;beep(520);
+ },
+ askClear(){
+  if(!st.list.length)return;const cm=this.cm;cm._c=null;
+  cm.innerHTML=`<b>Xóa tất cả con vật?</b><div><button data-a="all">🗑 Xóa hết</button><button data-a="x">Không</button></div>`;
+  cm.style.left=(board.clientWidth/2)+"px";cm.style.top=(board.clientHeight/2)+"px";cm.hidden=false;
+ },
+ gone(e){e.classList.remove("sel");e.classList.add("bye");if(e._bar)e._bar.hidden=true;e.onpointerdown=null;e.addEventListener("animationend",()=>e.remove(),{once:true})},
+ remove(e,quiet){
+  this.gone(e);st.list=st.list.filter(k=>k!==e);if(st.prov===e)st.prov=null;if(st.sel===e)st.sel=null;
+  if(!quiet){say("Đã xóa");this.hud()}
+ },
+ clearAll(){st.list.forEach(e=>this.gone(e));st.list=[];st.prov=null;st.sel=null;say("Đã xóa hết");this.hud()},
+ /* con vật đã hoàn thành đi theo ngón tay: chạm chỗ trống thì con vật đang chọn đi tới đó */
  bind(){
   if(this.bound)return;this.bound=1;
+  const xy=e=>{const r=board.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]};
   board.addEventListener("pointerdown",e=>{
    if(mode!=="saf"||announced.size||pts.size!==1)return;
-   const an=this.animal();if(!an)return;
-   const r=board.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,on=!!e.target.closest(".animal");
-   st.fp=e.pointerId;st.on=on;st.moved=0;st.lx=x;st.ly=y;
-   st.ox=on?an._p.x-x:0;st.oy=on?an._p.y-y:0;
-   if(!on)this.follow(x,y);
+   const a=st.sel;if(!a||!a._fin)return;
+   st.fp=e.pointerId;this.walk(...xy(e));
   });
-  board.addEventListener("pointermove",e=>{
-   if(e.pointerId!==st.fp)return;
-   const r=board.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-   st.moved+=Math.hypot(x-st.lx,y-st.ly);st.lx=x;st.ly=y;
-   if(!st.on||st.moved>10)this.follow(x+st.ox,y+st.oy);
-  });
-  ["pointerup","pointercancel"].forEach(n=>window.addEventListener(n,e=>{
-   if(e.pointerId!==st.fp)return;st.fp=null;
-   if(st.on&&st.moved<=10&&st.shown)this.poke(st.shown,true);
-  }));
+  board.addEventListener("pointermove",e=>{if(e.pointerId===st.fp)this.walk(...xy(e))});
+  ["pointerup","pointercancel"].forEach(n=>window.addEventListener(n,e=>{if(e.pointerId===st.fp)st.fp=null}));
  },
- follow(x,y){
-  st.target={x:Math.max(0,Math.min(x,board.clientWidth||9999)),y:Math.max(0,Math.min(y,board.clientHeight||9999))};
-  if(this.raf)return;
+ walk(x,y){
+  st.target={x,y};if(this.raf)return;
   const step=()=>{
-   const e=this.animal(),t=st.target;
-   if(!e||!t||mode!=="saf"){this.raf=0;return}
-   const p=e._p,dx=t.x-p.x,dy=t.y-p.y;
+   const a=st.sel,t=st.target;
+   if(!a||!a._fin||!t||mode!=="saf"){this.raf=0;return}
+   const [cx,cy]=this.pos(a),dx=t.x-cx,dy=t.y-cy;
    if(Math.hypot(dx,dy)<1){this.raf=0;return}
-   p.x+=dx*.07;p.y+=dy*.07;moveTo(e,p.x,p.y);
-   this.raf=requestAnimationFrame(step);
+   this.place(a,cx+dx*.07,cy+dy*.07);this.raf=requestAnimationFrame(step);
   };
   this.raf=requestAnimationFrame(step);
  }

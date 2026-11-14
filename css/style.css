@@ -203,9 +203,41 @@ body.home #games{display:flex;flex-direction:column;flex-wrap:nowrap;justify-con
 :root{--veil:#f3f9ff}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--veil:#1b2a49}}
 :root[data-theme="dark"]{--veil:#1b2a49}
-/* Safari: con vật ở lại, kéo/nhảy/mờ đi */
+
+/* ===== Safari: con vật ở lại, kéo/nhảy/mờ đi ===== */
 .animal{touch-action:none;cursor:grab}
 .animal.jump{animation:jump .55s ease-out}
 .animal.bye{animation:bye .6s ease-in-out forwards;pointer-events:none}
 @keyframes jump{0%,100%{transform:translate(-50%,-50%)}40%{transform:translate(-50%,-72%) scale(1.08)}}
 @keyframes bye{to{opacity:0;transform:translate(-50%,-50%) scale(.9)}}
+
+/* ===== Tạo nhân vật: thanh tiến độ, hoàn thành, tùy chọn, xóa ===== */
+.cbar{position:absolute;left:50%;top:-46px;transform:translateX(-50%);display:flex;gap:6px;white-space:nowrap;z-index:5}
+.cbar .p{width:34px;height:34px;border-radius:50%;background:#fff;border:3px solid #ced4da;display:grid;place-items:center;font-size:1.1rem;filter:grayscale(1);opacity:.75}
+.cbar .p.y{border-color:#40c057;filter:none;opacity:1;box-shadow:0 0 0 3px rgba(64,192,87,.3)}
+.cbar .fin{border:0;border-radius:999px;background:#40c057;color:#fff;padding:8px 18px;font-size:1rem;font-weight:700;box-shadow:0 4px 0 #2f9e44;animation:pulse 1.4s ease-in-out infinite}
+.ch.done,.acc.locked{animation:cbob 2.4s ease-in-out infinite}
+.acc.locked{pointer-events:none}
+.ch.sel::after{content:"";position:absolute;inset:-10px;border:4px dashed #fff;border-radius:50%;pointer-events:none}
+.ch.bye,.acc.bye{animation:bye .4s ease-in forwards;pointer-events:none}
+#cmenu{position:absolute;z-index:8;transform:translate(-50%,-100%);background:#fff;color:#3b2f2f;border-radius:20px;padding:10px 12px;box-shadow:0 6px 0 rgba(0,0,0,.12),0 0 0 3px #ffd43b;text-align:center}
+#cmenu[hidden]{display:none}
+#cmenu div{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;justify-content:center}
+#cmenu button{border:0;border-radius:999px;padding:8px 14px;font-size:.95rem;background:#4dabf7;color:#fff;box-shadow:0 3px 0 #1c7ed6}
+#cmenu button[data-a="del"],#cmenu button[data-a="all"]{background:#fa5252;box-shadow:0 3px 0 #c92a2a}
+@keyframes cbob{50%{transform:translate(-50%,calc(-50% - 6px))}}
+@keyframes pulse{50%{transform:scale(1.08)}}
+
+/* ===== Safari: ghép xong mới "sống dậy", chọn, nhiều con vật ===== */
+.animal:not(.done) *{animation-play-state:paused}
+.animal.sel::after{content:"";position:absolute;inset:-6px;border:4px dashed #fff;border-radius:50%;pointer-events:none}
+
+/* quay mặt: lật mượt khi đổi hướng */
+.animal,.ch,.acc{transition:scale .2s ease-out,rotate .08s linear}
+
+/* Safari: ghép xong mới "sống dậy", chọn, nhiều con vật */
+.animal:not(.done) *{animation-play-state:paused}
+.animal.sel::after{content:"";position:absolute;inset:-6px;border:4px dashed #fff;border-radius:50%;pointer-events:none}
+/* quay mặt: lật mượt khi đổi hướng */
+.animal,.ch,.acc{transition:scale .2s ease-out}
+.animal,.ch,.acc{transition:scale .2s ease-out,rotate .08s linear}
