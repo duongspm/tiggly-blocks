@@ -14,10 +14,7 @@ const gDraw={
  start(){
   st={ch:[],sel:null,fp:null,target:null};
   hudSet(`Đặt khối để tạo nhân vật!<br><small>Kéo mắt, mũi, miệng vào nhân vật · giữ lâu vào nhân vật để xóa/sửa</small><br><span class="scn"><button onclick="setScene('meadow')">🌳</button><button onclick="setScene('sea')">🌊</button><button onclick="setScene('safari')">🦁</button><button onclick="setScene('sky')">☁️</button></span> <button onclick="gDraw.askClear()">🗑 Xóa tất cả</button>`);
-  const tr=document.createElement("div");tr.id="dtray";
-  tr.innerHTML=ACC.map(a=>`<button data-a="${a[0]}"><svg viewBox="${a[4]}">${a[5]}</svg><small>${a[1]}</small></button>`).join("");
-  tr.addEventListener("pointerdown",e=>{e.stopPropagation();const b=e.target.closest("[data-a]");if(!b)return;e.preventDefault();this.spawn(b.dataset.a,e)});
-  board.appendChild(tr);
+    this.buildTray();
   const old=document.getElementById("cmenu");if(old)old.remove();
   const cm=this.cm=document.createElement("div");cm.id="cmenu";cm.hidden=true;board.appendChild(cm);
   cm.addEventListener("pointerdown",e=>e.stopPropagation());
@@ -28,31 +25,10 @@ const gDraw={
   this.bind();
  },
  /* ---- vị trí: lưu trong el._p và dời bằng translate (mượt, không buộc trình duyệt tính lại bố cục) ---- */
- place(el,x,y){
-  x=Math.max(0,Math.min(x,board.clientWidth||9999));y=Math.max(0,Math.min(y,board.clientHeight||9999));
-  const o=el._p;el._p={x,y};moveTo(el,x,y);
-  if(o&&el.classList.contains("ch")){this.face(el,x-o.x);this.lean(el,x-o.x)}   /* quay mặt + nghiêng người */
- },
- face(c,dx){ /* lật nhân vật và phụ kiện của nó (đổi bên) khi đổi hướng đi */
-  c._acc=Math.sign(dx)===Math.sign(c._acc||0)?(c._acc||0)+dx:dx;
-  if(Math.abs(c._acc)<10)return;
-  const d=c._acc>0?1:-1;if((c._dir||1)===d)return;
-  c._dir=d;c.style.scale=`${d} 1`;
-  this.parts(c).forEach(a=>{a._ox=-a._ox;a._dir=d;a.style.scale=`${d} 1`});
- },
+ place(el,x,y){x=Math.max(0,Math.min(x,board.clientWidth||9999));y=Math.max(0,Math.min(y,board.clientHeight||9999));el._p={x,y};moveTo(el,x,y);if(el._bar)el._bar.classList.toggle("l",x>(board.clientWidth||9999)*.6)},
  pos(el){const p=el._p||{x:0,y:0};return [p.x,p.y]},
  parts(c){return [...board.querySelectorAll(".acc")].filter(a=>a._ch===c)},
- follow(c){ /* phụ kiện đi theo nhân vật, xoay cùng góc nghiêng quanh tâm nhân vật */
-  const [cx,cy]=this.pos(c),t=(c._ln||0)*Math.PI/180,co=Math.cos(t),si=Math.sin(t);
-  this.parts(c).forEach(a=>{this.place(a,cx+a._ox*co-a._oy*si,cy+a._ox*si+a._oy*co);a.style.rotate=(c._ln||0)+"deg"});
- },
- lean(c,dx){ /* nghiêng tối đa 8° về phía đang đi, rồi thả lỏng dần về thẳng */
-  const set=()=>{c.style.rotate=c._ln+"deg";this.follow(c)};
-  c._ln=Math.max(-8,Math.min(8,(c._ln||0)*.6+(Math.abs(dx)<1?0:dx*.5)));set();
-  clearTimeout(c._lt);
-  const relax=()=>{c._ln*=.55;if(Math.abs(c._ln)<.4)c._ln=0;set();if(c._ln)c._lt=setTimeout(relax,40)};
-  c._lt=setTimeout(relax,120);
- },
+ follow(c){const [cx,cy]=this.pos(c);this.parts(c).forEach(a=>this.place(a,cx+a._ox,cy+a._oy))},
  /* ---- phụ kiện ---- */
  mkAcc(id){
   const a=ACC.find(x=>x[0]===id),el=document.createElement("div");
@@ -91,18 +67,17 @@ const gDraw={
   const c=st.ch.find(k=>!k._fin&&Math.hypot(this.pos(k)[0]-x,this.pos(k)[1]-y)<95);
   if(!c){el._ch=null;return}
   const [cx,cy]=this.pos(c);el._ch=c;el._ox=x-cx;el._oy=y-cy;el._dir=c._dir||1;el.style.scale=`${el._dir} 1`;
-  el._dir=c._dir||1;el.style.scale=`${el._dir} 1`;
   beep(660);
   if(!this.progress(c))say(ACC.find(a=>a[0]===el.dataset.a)[1]);
  },
  /* ---- thanh tiến độ: cho biết khi nào nhân vật hoàn thành ---- */
  progress(c){
-  const ty=new Set(this.parts(c).map(a=>a.dataset.a)),have=[ty.has("eyes"),ty.has("nose"),ty.has("mouth")||ty.has("smile")];
+  const g=new Set(this.parts(c).map(partGroup)),have=[g.has("eyes"),g.has("nose"),g.has("mouth")];
   c._ready=have.every(Boolean);
   if(c._fin){c._bar.hidden=true;return false}
   c._bar.hidden=false;
-  c._bar.innerHTML=c._ready?`<button class="fin">✅ Hoàn thành</button>`:["👀","👃","👄"].map((e,i)=>`<span class="p${have[i]?" y":""}">${e}</span>`).join("");
-  if(c._ready&&!c._said){c._said=1;beep(880);say("Nhân vật xong rồi! Bấm Hoàn thành nhé");return true}
+  c._bar.innerHTML=c._ready?`<button class="fin" aria-label="Hoàn thành"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>`:["👀","👃","👄"].map((e,i)=>`<span class="p${have[i]?" y":""}">${e}</span>`).join("");
+  if(c._ready&&!c._said){c._said=1;beep(880);say("Nhân vật xong rồi! Bấm dấu tích xanh nhé");return true}
   return false;
  },
  finish(c){ /* bấm Hoàn thành: phụ kiện dính vào nhân vật, nhân vật "sống dậy" và di chuyển được */

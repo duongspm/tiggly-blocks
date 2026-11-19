@@ -42,6 +42,7 @@ hud.addEventListener("click",e=>{const s=e.target.closest("[data-k]");if(s)showT
 tipEl.addEventListener("pointerdown",e=>e.stopPropagation());
 tipEl.addEventListener("click",e=>{if(e.target.tagName==="BUTTON")tipEl.hidden=true});
 ANI["circle,triangle"].face=-1; /* con cá được vẽ nhìn sang trái */
+ANI["circle,square"].face=1;    /* con rùa được vẽ nhìn sang phải */
 const gSaf={
  start(){
   st={list:[],sel:null,prov:null,cur:"",n:0,fp:null,target:null};
@@ -58,11 +59,12 @@ const gSaf={
  place(el,x,y){
   x=Math.max(0,Math.min(x,board.clientWidth||9999));y=Math.max(0,Math.min(y,board.clientHeight||9999));
   const o=el._p;el._p={x,y};moveTo(el,x,y);
-  if(o){this.face(el,x-o.x);this.lean(el,x-o.x)}        /* quay mặt + nghiêng người theo hướng đi */
+  if(el._bar)el._bar.classList.toggle("l",x>(board.clientWidth||9999)*.6);
+  if(o&&el._fin){this.face(el,x-o.x);this.lean(el,x-o.x)}       /* quay mặt + nghiêng người theo hướng đi */
  },
  face(e,dx){ /* đi sang phải/trái đủ ~10px thì lật con vật; ANI[..].face = hướng nhìn của hình vẽ gốc (mặc định 1 = nhìn phải) */
   e._acc=Math.sign(dx)===Math.sign(e._acc||0)?(e._acc||0)+dx:dx;
-  if(Math.abs(e._acc)<10)return;
+  if(Math.abs(e._acc)<10||!ANI[e._k].face)return;
   const d=e._acc>0?1:-1;if(e._dir===d)return;
   e._dir=d;e.style.scale=`${d*(ANI[e._k].face||1)} 1`;
  },
@@ -91,7 +93,7 @@ const gSaf={
   const e=document.createElement("div");e.className="animal";e._k=k;e._fin=0;
   e.style.cssText=`width:${sz}px;height:${sz}px;left:0;top:0`;
   e.innerHTML=`<svg viewBox='0 0 200 200' class='an-${a.c}'>${a.svg}</svg>`;
-  const bar=document.createElement("div");bar.className="cbar";bar.innerHTML=`<button class="fin">✅ Hoàn thành</button>`;e.appendChild(bar);e._bar=bar;
+  const bar=document.createElement("div");bar.className="cbar";bar.innerHTML=`<button class="fin" aria-label="Hoàn thành"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>`;e.appendChild(bar);e._bar=bar;
   bar.addEventListener("pointerdown",ev=>ev.stopPropagation());
   bar.addEventListener("click",ev=>{if(ev.target.closest(".fin"))this.finish(e)});
   e.onpointerdown=ev=>{ev.stopPropagation();e.setPointerCapture(ev.pointerId);this.startDrag(e,ev)};

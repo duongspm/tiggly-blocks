@@ -54,7 +54,13 @@
   <meta property="og:image:height" content="630">
 
   <meta property="og:image:alt" content="Tiggly Blocks – by Duongg Trò chơi giáo dục hình khối cho bé">
-
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tiggly Blocks">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image">
 
@@ -96,7 +102,7 @@
 </div>
 <div id="status"></div>
 <div id="games"><p class="learn">Học: nhận biết hình · phân loại · tư duy ghép hình · động vật</p></div>
-<div id="top"><button id="homeBtn" aria-label="Màn hình chính">🏠</button><div id="title"></div><span id="stars">⭐ 0</span><button id="gear" aria-label="Dành cho phụ huynh (giữ 1 giây)">⚙️</button></div>
+<div id="top"><button id="homeBtn" aria-label="Màn hình chính">🏠</button><div id="title"></div><span id="stars">⭐ 0</span><button id="fsBtn" aria-label="Toàn màn hình"></button><button id="gear" aria-label="Dành cho phụ huynh (giữ 1 giây)">⚙️</button></div>
 <div id="board"><div id="hud"></div><div id="hint">Đặt khối lên đây nhé!</div></div>
 <script src="js/core/config.js"></script>
 <script src="js/core/storage.js"></script>
@@ -116,10 +122,12 @@
 <script src="js/games/riddle.js"></script>
 <script src="js/games/balloon.js"></script>
 <script src="js/games/draw.js"></script>
+<script src="js/games/draw-parts.js"></script>
 <script src="js/modes.js"></script>
 <script src="js/ui/base.js"></script>
 <script src="js/ui/home.js"></script>
 <script src="js/ui/parent.js"></script>
 <script src="js/ui/transition.js"></script>
+<script src="js/ui/kiosk.js"></script>
 </body>
 </html>
